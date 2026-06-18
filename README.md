@@ -172,44 +172,13 @@ in your browser.
 ---
 ## 📸 Dashboard Screenshots
 
-### ❤️ Heart Disease Risk Assessment
+![Heart Dashboard](screenshots/heartdashboard.png)
 
-<p align="center">
-  <img src="screenshots/heartdashboard.png" width="900">
-</p>
+![Diabetes Dashboard](screenshots/diabetesdashboard.png)
 
-Provides real-time heart disease risk prediction using Logistic Regression and Random Forest models with explainable risk factors.
+![Analytics Dashboard](screenshots/analyticsdashboard.png)
 
----
-
-### 🩺 Diabetes Risk Assessment
-
-<p align="center">
-  <img src="screenshots/diabetesdashboard.png" width="900">
-</p>
-
-Predicts diabetes risk based on clinical parameters and displays probability-based health insights.
-
----
-
-### 📊 Model Analytics Dashboard
-
-<p align="center">
-  <img src="screenshots/analyticsdashboard.png" width="900">
-</p>
-
-Visualizes model performance using ROC Curves, Confusion Matrices, Accuracy, Precision, Recall, F1-Score, and Feature Importance Analysis.
-
----
-
-### 🔒 Privacy & Ethics Dashboard
-
-<p align="center">
-  <img src="screenshots/ethicsdashboard.png" width="900">
-</p>
-
-Demonstrates privacy-preserving healthcare analytics through data anonymization, SHA-256 hashing, and ethical AI practices inspired by HIPAA and GDPR standards.
-
+![Ethics Dashboard](screenshots/ethicsdashboard.png)
 ## 🎯 Future Enhancements
 
 * Deep Learning Models
