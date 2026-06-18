@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aegis - Healthcare Predictive Analytics Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Tailwind or standard styles (using standard Vanilla CSS) -->
+    <link rel="stylesheet" href="style.css">
+    <!-- Chart.js for beautiful graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dark-mode">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" class="heart-pulse-icon">
+                        <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                    </svg>
+                </div>
+                <h1>Aegis<span>Analytics</span></h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <button class="nav-item active" id="btn-tab-heart" onclick="switchTab('heart')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    <span>Heart Disease</span>
+                </button>
+                <button class="nav-item" id="btn-tab-diabetes" onclick="switchTab('diabetes')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                    <span>Diabetes Risk</span>
+                </button>
+                <button class="nav-item" id="btn-tab-analytics" onclick="switchTab('analytics')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                    <span>Model Analytics</span>
+                </button>
+                <button class="nav-item" id="btn-tab-ethics" onclick="switchTab('ethics')">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <span>Privacy & Ethics</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="server-status">
+                    <span class="status-indicator online" id="server-status-dot"></span>
+                    <span id="server-status-text">Server Connected</span>
+                </div>
+                <div class="toggle-mode-container">
+                    <span class="privacy-lock-icon">
+                        <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </span>
+                    <span class="privacy-lock-text">Zero-Leak Assurance</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <div class="header-title">
+                    <span class="subtitle" id="current-category-sub">CLINICAL PREDICTION ENGINE</span>
+                    <h2 id="current-category-title">Heart Disease Risk Assessment</h2>
+                </div>
+                <div class="header-actions">
+                    <div class="anonymize-toggle-badge">
+                        <span class="badge-icon">
+                            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" stroke-width="2.5" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </span>
+                        <span>Client-side de-identified</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB 1: Heart Disease Calculator -->
+            <section class="tab-pane active" id="pane-heart">
+                <div class="grid-layout">
+                    <!-- Left: Form Card -->
+                    <div class="card form-card">
+                        <div class="card-header">
+                            <h3>Patient Physiological Metrics</h3>
+                            <p>Adjust the values to check risk probability. All fields are normalized before calculation.</p>
+                        </div>
+                        <form id="heart-form" onsubmit="handlePredictSubmit(event, 'heart')">
+                            <!-- Privacy Input -->
+                            <div class="form-group span-full">
+                                <label for="heart-patient-name">Patient Name / Identifier (Optional - Hashed Immediately)</label>
+                                <input type="text" id="heart-patient-name" placeholder="e.g. John Doe (not saved to disk)" class="form-input">
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="heart-age">Age (years)</label>
+                                    <input type="number" id="heart-age" min="20" max="90" value="54" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-sex">Sex</label>
+                                    <select id="heart-sex" class="form-input" required>
+                                        <option value="1" selected>Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-cp">Chest Pain Type</label>
+                                    <select id="heart-cp" class="form-input" required>
+                                        <option value="0">Typical Angina (0)</option>
+                                        <option value="1">Atypical Angina (1)</option>
+                                        <option value="2">Non-anginal Pain (2)</option>
+                                        <option value="3" selected>Asymptomatic (3)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-trestbps">Resting BP (mm Hg)</label>
+                                    <input type="number" id="heart-trestbps" min="80" max="200" value="130" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-chol">Serum Cholesterol (mg/dl)</label>
+                                    <input type="number" id="heart-chol" min="100" max="600" value="240" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-fbs">Fasting Blood Sugar > 120 mg/dl</label>
+                                    <select id="heart-fbs" class="form-input" required>
+                                        <option value="0" selected>False (0)</option>
+                                        <option value="1">True (1)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-restecg">Resting ECG Results</label>
+                                    <select id="heart-restecg" class="form-input" required>
+                                        <option value="0">Normal (0)</option>
+                                        <option value="1">ST-T Wave Abnormality (1)</option>
+                                        <option value="2" selected>LV Hypertrophy (2)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-thalach">Max Heart Rate (bpm)</label>
+                                    <input type="number" id="heart-thalach" min="60" max="220" value="150" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-exang">Exercise Induced Angina</label>
+                                    <select id="heart-exang" class="form-input" required>
+                                        <option value="0" selected>No (0)</option>
+                                        <option value="1">Yes (1)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-oldpeak">ST Depression (oldpeak)</label>
+                                    <input type="number" id="heart-oldpeak" min="0" max="10" step="0.1" value="1.0" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-slope">Slope of Peak ST</label>
+                                    <select id="heart-slope" class="form-input" required>
+                                        <option value="0">Upsloping (0)</option>
+                                        <option value="1" selected>Flat (1)</option>
+                                        <option value="2">Downsloping (2)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-ca">Major Vessels Colored (0-3)</label>
+                                    <input type="number" id="heart-ca" min="0" max="3" value="0" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-thal">Thalassemia Type</label>
+                                    <select id="heart-thal" class="form-input" required>
+                                        <option value="3" selected>Normal (3)</option>
+                                        <option value="6">Fixed Defect (6)</option>
+                                        <option value="7">Reversible Defect (7)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="heart-model">Inference Model</label>
+                                    <select id="heart-model" class="form-input model-selector">
+                                        <option value="lr" selected>Logistic Regression (Interpretable)</option>
+                                        <option value="rf">Random Forest (High Accuracy)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn glowing-btn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <span>Assess Heart Risk</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Results Card -->
+                    <div class="card results-card" id="heart-results-card">
+                        <div class="empty-state" id="heart-empty-state">
+                            <div class="pulse-ring">
+                                <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none">
+                                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                                </svg>
+                            </div>
+                            <h4>Awaiting Assessment Input</h4>
+                            <p>Adjust parameters and click the button to trigger client-anonymized prediction inference.</p>
+                        </div>
+                        
+                        <div class="results-content hidden" id="heart-results-content">
+                            <div class="risk-gauge-container">
+                                <div class="risk-badge" id="heart-risk-badge">LOW RISK</div>
+                                <div class="risk-percentage" id="heart-risk-pct">12.4%</div>
+                                <div class="risk-label">Probability of Heart Condition</div>
+                                <div class="gauge-bar-outer">
+                                    <div class="gauge-bar-inner" id="heart-gauge-bar" style="width: 12.4%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="anonymity-audit-box">
+                                <div class="audit-row">
+                                    <span class="audit-label">Patient Hash (pseudonym):</span>
+                                    <span class="audit-val monospace" id="heart-audit-hash">--</span>
+                                </div>
+                                <div class="audit-row">
+                                    <span class="audit-label">Privacy Shield:</span>
+                                    <span class="audit-val text-success">Active (zero data written to server disk)</span>
+                                </div>
+                            </div>
+
+                            <div class="explainability-section">
+                                <h4>Predictive Drivers (Risk Impact Breakdown)</h4>
+                                <div class="explain-list" id="heart-explain-list">
+                                    <!-- Dynamic rows will go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: Diabetes Calculator -->
+            <section class="tab-pane" id="pane-diabetes">
+                <div class="grid-layout">
+                    <!-- Left: Form Card -->
+                    <div class="card form-card">
+                        <div class="card-header">
+                            <h3>Patient Clinical Parameters</h3>
+                            <p>Adjust parameters to predict risk. Zero-value clinical indicators are automatically imputed via dataset medians.</p>
+                        </div>
+                        <form id="diabetes-form" onsubmit="handlePredictSubmit(event, 'diabetes')">
+                            <!-- Privacy Input -->
+                            <div class="form-group span-full">
+                                <label for="diabetes-patient-name">Patient Name / Identifier (Optional - Hashed Immediately)</label>
+                                <input type="text" id="diabetes-patient-name" placeholder="e.g. Jane Smith (not saved to disk)" class="form-input">
+                            </div>
+                            
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="diabetes-pregnancies">Pregnancies</label>
+                                    <input type="number" id="diabetes-pregnancies" min="0" max="20" value="3" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-glucose">Plasma Glucose (mg/dl)</label>
+                                    <input type="number" id="diabetes-glucose" min="40" max="250" value="120" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-bloodpressure">Diastolic BP (mm Hg)</label>
+                                    <input type="number" id="diabetes-bloodpressure" min="30" max="150" value="70" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-skinthickness">Triceps Skin Fold (mm)</label>
+                                    <input type="number" id="diabetes-skinthickness" min="5" max="100" value="20" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-insulin">2-Hour Serum Insulin (mu U/ml)</label>
+                                    <input type="number" id="diabetes-insulin" min="10" max="900" value="80" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-bmi">BMI (Weight in kg/(Height in m)<sup>2</sup>)</label>
+                                    <input type="number" id="diabetes-bmi" min="15.0" max="65.0" step="0.1" value="32.0" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-pedigree">Diabetes Pedigree Function</label>
+                                    <input type="number" id="diabetes-pedigree" min="0.05" max="3.00" step="0.01" value="0.45" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-age">Age (years)</label>
+                                    <input type="number" id="diabetes-age" min="21" max="90" value="33" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="diabetes-model">Inference Model</label>
+                                    <select id="diabetes-model" class="form-input model-selector">
+                                        <option value="lr" selected>Logistic Regression (Interpretable)</option>
+                                        <option value="rf">Random Forest (High Accuracy)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="submit-btn glowing-btn">
+                                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2.5" fill="none" style="margin-right: 8px;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                <span>Assess Diabetes Risk</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right: Results Card -->
+                    <div class="card results-card" id="diabetes-results-card">
+                        <div class="empty-state" id="diabetes-empty-state">
+                            <div class="pulse-ring">
+                                <svg viewBox="0 0 24 24" width="48" height="48" stroke="currentColor" stroke-width="1.5" fill="none">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <h4>Awaiting Assessment Input</h4>
+                            <p>Adjust parameters and click the button to trigger client-anonymized prediction inference.</p>
+                        </div>
+                        
+                        <div class="results-content hidden" id="diabetes-results-content">
+                            <div class="risk-gauge-container">
+                                <div class="risk-badge" id="diabetes-risk-badge">LOW RISK</div>
+                                <div class="risk-percentage" id="diabetes-risk-pct">24.5%</div>
+                                <div class="risk-label">Probability of Diabetes Development</div>
+                                <div class="gauge-bar-outer">
+                                    <div class="gauge-bar-inner" id="diabetes-gauge-bar" style="width: 24.5%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="anonymity-audit-box">
+                                <div class="audit-row">
+                                    <span class="audit-label">Patient Hash (pseudonym):</span>
+                                    <span class="audit-val monospace" id="diabetes-audit-hash">--</span>
+                                </div>
+                                <div class="audit-row">
+                                    <span class="audit-label">Privacy Shield:</span>
+                                    <span class="audit-val text-success">Active (zero data written to server disk)</span>
+                                </div>
+                            </div>
+
+                            <div class="explainability-section">
+                                <h4>Predictive Drivers (Risk Impact Breakdown)</h4>
+                                <div class="explain-list" id="diabetes-explain-list">
+                                    <!-- Dynamic rows will go here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: Model Analytics -->
+            <section class="tab-pane" id="pane-analytics">
+                <div class="analytics-tabs">
+                    <button class="analytics-tab active" id="btn-ana-heart" onclick="switchAnalyticsSub('heart')">Heart Disease Model</button>
+                    <button class="analytics-tab" id="btn-ana-diabetes" onclick="switchAnalyticsSub('diabetes')">Diabetes Model</button>
+                </div>
+                
+                <div class="analytics-grid">
+                    <!-- Metrics Card -->
+                    <div class="card metrics-card">
+                        <div class="card-header">
+                            <h3>Model Performance Comparison</h3>
+                            <p>Cross-validation metrics comparing Logistic Regression vs Random Forest Classifiers.</p>
+                        </div>
+                        <div class="metrics-table-container">
+                            <table class="metrics-table">
+                                <thead>
+                                    <tr>
+                                        <th>Metric</th>
+                                        <th>Logistic Regression</th>
+                                        <th>Random Forest</th>
+                                        <th>Optimal Target</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="metrics-table-body">
+                                    <!-- Dynamic data loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="confusion-matrices-container">
+                            <div class="cm-box">
+                                <h5>Logistic Regression CM</h5>
+                                <div class="cm-grid" id="cm-lr-grid">
+                                    <!-- Dynamic matrices -->
+                                </div>
+                            </div>
+                            <div class="cm-box">
+                                <h5>Random Forest CM</h5>
+                                <div class="cm-grid" id="cm-rf-grid">
+                                    <!-- Dynamic matrices -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ROC Curve Card -->
+                    <div class="card chart-card">
+                        <div class="card-header">
+                            <h3>ROC Curves (Receiver Operating Characteristic)</h3>
+                            <p>Displays Sensitivity vs Specificity. Higher AUC denotes a stronger predictive signal.</p>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="rocChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Feature Importance Card -->
+                    <div class="card chart-card span-full">
+                        <div class="card-header">
+                            <h3>Feature Importance & Risk Weight Comparison</h3>
+                            <p>Shows how much each feature impacts risk predictions. Logistic Regression values denote scaled coefficients; Random Forest values represent Gini importances.</p>
+                        </div>
+                        <div class="chart-container-large">
+                            <canvas id="importanceChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: Ethics & Privacy -->
+            <section class="tab-pane" id="pane-ethics">
+                <div class="ethics-content-layout">
+                    <!-- Text Info Card -->
+                    <div class="card ethics-details-card">
+                        <div class="card-header">
+                            <h3>Ethical Data Handling & HIPAA/GDPR Compliance</h3>
+                            <p>How the Aegis platform protects patients, handles sensitive physiological parameters, and minimizes algorithmic bias.</p>
+                        </div>
+                        
+                        <div class="ethics-topics">
+                            <div class="ethics-topic">
+                                <div class="topic-icon">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                </div>
+                                <div class="topic-body">
+                                    <h5>Data Minimization & In-Memory Calculations</h5>
+                                    <p>Aegis enforces the principle of data minimization by processing patient physiological metrics completely in-memory. The raw values are never stored in log files, cached on disks, or transmitted to any external databases. Once prediction coefficients are evaluated, the data is permanently flushed from local memory variables.</p>
+                                </div>
+                            </div>
+
+                            <div class="ethics-topic">
+                                <div class="topic-icon">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                </div>
+                                <div class="topic-body">
+                                    <h5>Pseudonymization & Cryptographic Salting</h5>
+                                    <p>To adhere to HIPAA Safe Harbor guidelines and GDPR Article 25 requirements, any patient identifying labels (like names or registration IDs) are cryptographically de-identified before calculations. We apply SHA-256 hashes client-side, ensuring that no cleartext Personal Health Information (PHI) is ever exposed in downstream server components.</p>
+                                </div>
+                            </div>
+
+                            <div class="ethics-topic">
+                                <div class="topic-icon">
+                                    <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                                </div>
+                                <div class="topic-body">
+                                    <h5>Algorithmic Bias & Feature Exclusions</h5>
+                                    <p>Classification algorithms can easily replicate systemic racial, economic, or demographic disparities. Our training datasets (Cleveland Heart Clinic, Pima Indian Communities) are analyzed for demographic representation. We exclude high-bias parameters such as socioeconomic status, ZIP codes, and insurance categories to prevent surrogate demographic profiling, focusing strictly on objective biometrics.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Sandbox Card -->
+                    <div class="card ethics-sandbox-card">
+                        <div class="card-header">
+                            <h3>Interactive Privacy Sandbox</h3>
+                            <p>Simulate client-side de-identification. Watch the cryptographic hashing algorithm transform sensitive text into clinical tokens.</p>
+                        </div>
+                        
+                        <div class="sandbox-box">
+                            <div class="form-group">
+                                <label for="sandbox-input">Enter Sensitive Patient Identifiers (e.g. Name, Record ID)</label>
+                                <input type="text" id="sandbox-input" placeholder="e.g. MPVS SUMANTH #4829" class="form-input" oninput="runSandboxHash()">
+                            </div>
+                            
+                            <div class="sandbox-arrow">
+                                <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg>
+                                <span>Cryptographic Hashing (SHA-256)</span>
+                            </div>
+
+                            <div class="sandbox-result-box">
+                                <label>Hashed Pseudonym Sent to Server:</label>
+                                <div class="monospace-token" id="sandbox-hash-output">Type something above...</div>
+                                <span class="badge-tag-success">HIPAA Secure Token</span>
+                            </div>
+
+                            <div class="sandbox-data-flow">
+                                <h5>Data Minimization Execution Audit:</h5>
+                                <ul class="audit-flow-list">
+                                    <li class="flow-item done">Client intercepts patient name.</li>
+                                    <li class="flow-item done">Computes local SHA-256 hash.</li>
+                                    <li class="flow-item done">Replaces name key with hash in API payload.</li>
+                                    <li class="flow-item active" id="audit-flow-server">Server receives hashed packet. Fits model parameters in RAM.</li>
+                                    <li class="flow-item active" id="audit-flow-done">Inference completed. No logs or cache files created on server.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Link JS Logic -->
+    <script src="main.js"></script>
+</body>
+</html>
