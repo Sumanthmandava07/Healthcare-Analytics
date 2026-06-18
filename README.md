@@ -170,15 +170,25 @@ in your browser.
 * Privacy & Ethics Module
 
 ---
-## 📸 Dashboard Screenshots
+<h3>❤️ Heart Disease Risk Assessment</h3>
+<p align="center">
+  <img src="heartdashboard.png" width="900">
+</p>
 
-![Heart Dashboard](screenshots/heartdashboard.png)
+<h3>🩺 Diabetes Risk Assessment</h3>
+<p align="center">
+  <img src="diabetesdashboard.png" width="900">
+</p>
 
-![Diabetes Dashboard](screenshots/diabetesdashboard.png)
+<h3>📊 Model Analytics Dashboard</h3>
+<p align="center">
+  <img src="analyticsdashboard.png" width="900">
+</p>
 
-![Analytics Dashboard](screenshots/analyticsdashboard.png)
-
-![Ethics Dashboard](screenshots/ethicsdashboard.png)
+<h3>🔒 Privacy & Ethics Dashboard</h3>
+<p align="center">
+  <img src="ethicsdashboard.png" width="900">
+</p>
 ## 🎯 Future Enhancements
 
 * Deep Learning Models
